@@ -12,8 +12,7 @@ import java.util.List;
  *
  * @author pgn
  */
-public class SingletonModel
-{
+public class SingletonModel {
 
     /**
      * The static variable that holds the singleton object of this class.
@@ -27,10 +26,8 @@ public class SingletonModel
      *
      * @return The singleton object of this class.
      */
-    public static synchronized SingletonModel getInstance()
-    {
-        if (INSTANCE == null)
-        {
+    public static synchronized SingletonModel getInstance() {
+        if (INSTANCE == null) {
             INSTANCE = new SingletonModel();
         }
         return INSTANCE;
@@ -40,8 +37,7 @@ public class SingletonModel
      * The private constructor of this class. It's private so to prevent
      * instantiation outside of the scope of this class.
      */
-    private SingletonModel()
-    {
+    private SingletonModel() {
         this.naughtyWords = new ArrayList<>();
     }
 
@@ -50,8 +46,7 @@ public class SingletonModel
      *
      * @param naughtyWord
      */
-    public void addNaughtyWord(String naughtyWord)
-    {
+    public void addNaughtyWord(String naughtyWord) {
         naughtyWords.add(naughtyWord);
     }
 
@@ -60,26 +55,24 @@ public class SingletonModel
      *
      * @param manyNaughtyWords The many naughty words.
      */
-    public void addManyNaughtyWords(String... manyNaughtyWords)
-    {
-        for (String naughtyWord : manyNaughtyWords)
-        {
+    public void addManyNaughtyWords(String... manyNaughtyWords) {
+        for (String naughtyWord : manyNaughtyWords) {
             naughtyWords.add(naughtyWord);
         }
     }
 
     /**
-     * Will add two naughty words to the class, or only one if they are the same.
+     * Will add two naughty words to the class, or only one if they are the
+     * same.
+     *
      * @param aNaughtyWord The first naughty word to add.
      * @param bNaughtyWord The second naughty word to add.
      */
-    public void addOneOrTwoNaughtyWords(String aNaughtyWord, String bNaughtyWord)
-    {
-        if (aNaughtyWord.equalsIgnoreCase(bNaughtyWord))
-        {
+    public void addOneOrTwoNaughtyWords(String aNaughtyWord, String bNaughtyWord) {
+        if (aNaughtyWord.equalsIgnoreCase(bNaughtyWord)) {
             addNaughtyWord(aNaughtyWord);
-        } else
-        {
+        }
+        else {
             addManyNaughtyWords(aNaughtyWord, bNaughtyWord);
         }
     }
@@ -89,18 +82,15 @@ public class SingletonModel
      *
      * @return
      */
-    public int getNumberOfNaughtyWords()
-    {
+    public int getNumberOfNaughtyWords() {
         return naughtyWords.size();
     }
 
     /**
      * Removes the first of the naughty words.
      */
-    public void removeFirstNaughtyWord()
-    {
-        if (!naughtyWords.isEmpty())
-        {
+    public void removeFirstNaughtyWord() {
+        if (!naughtyWords.isEmpty()) {
             naughtyWords.remove(0);
         }
     }
@@ -110,13 +100,11 @@ public class SingletonModel
      *
      * @return
      */
-    public String getFirstNaughtyWord()
-    {
-        if (!naughtyWords.isEmpty())
-        {
+    public String getFirstNaughtyWord() {
+        if (!naughtyWords.isEmpty()) {
             return naughtyWords.get(0);
-        } else
-        {
+        }
+        else {
             throw new RuntimeException("No more naughty words :-(");
         }
     }
@@ -126,8 +114,7 @@ public class SingletonModel
      *
      * @return
      */
-    public boolean isListOfNaughtyWordsEmpty()
-    {
+    public boolean isListOfNaughtyWordsEmpty() {
         return naughtyWords.isEmpty();
     }
 

@@ -1,0 +1,684 @@
+diff --git a/nbproject/build-impl.xml b/nbproject/build-impl.xml
+index 056f2be..c21c023 100644
+--- a/nbproject/build-impl.xml
++++ b/nbproject/build-impl.xml
+@@ -71,8 +71,8 @@ is divided into following sections:
+         <property file="${user.properties.file}"/>
+         <!-- The two properties below are usually overridden -->
+         <!-- by the active platform. Just a fallback. -->
+-        <property name="default.javac.source" value="1.4"/>
+-        <property name="default.javac.target" value="1.4"/>
++        <property name="default.javac.source" value="1.6"/>
++        <property name="default.javac.target" value="1.6"/>
+     </target>
+     <target depends="-pre-init,-init-private,-init-libraries,-init-user" name="-init-project">
+         <property file="nbproject/configs/${config}.properties"/>
+@@ -101,7 +101,7 @@ is divided into following sections:
+             <and>
+                 <isset property="javac.profile"/>
+                 <length length="0" string="${javac.profile}" when="greater"/>
+-                <matches pattern="1\.[89](\..*)?" string="${javac.source}"/>
++                <matches pattern="((1\.[89])|9)(\..*)?" string="${javac.source}"/>
+             </and>
+         </condition>
+         <condition property="do.archive">
+@@ -181,6 +181,7 @@ is divided into following sections:
+         <property name="application.args" value=""/>
+         <property name="source.encoding" value="${file.encoding}"/>
+         <property name="runtime.encoding" value="${source.encoding}"/>
++        <property name="manifest.encoding" value="${source.encoding}"/>
+         <condition property="javadoc.encoding.used" value="${javadoc.encoding}">
+             <and>
+                 <isset property="javadoc.encoding"/>
+@@ -865,7 +866,7 @@ is divided into following sections:
+                     </chainedmapper>
+                 </pathconvert>
+                 <taskdef classname="org.netbeans.modules.java.j2seproject.copylibstask.CopyLibs" classpath="${libs.CopyLibs.classpath}" name="copylibs"/>
+-                <copylibs compress="${jar.compress}" excludeFromCopy="${copylibs.excludes}" index="${jar.index}" indexMetaInf="${jar.index.metainf}" jarfile="${dist.jar}" manifest="@{manifest}" rebase="${copylibs.rebase}" runtimeclasspath="${run.classpath.without.build.classes.dir}">
++                <copylibs compress="${jar.compress}" excludeFromCopy="${copylibs.excludes}" index="${jar.index}" indexMetaInf="${jar.index.metainf}" jarfile="${dist.jar}" manifest="@{manifest}" manifestencoding="UTF-8" rebase="${copylibs.rebase}" runtimeclasspath="${run.classpath.without.build.classes.dir}">
+                     <fileset dir="${build.classes.dir}" excludes="${dist.archive.excludes}"/>
+                     <manifest>
+                         <attribute name="Class-Path" value="${jar.classpath}"/>
+@@ -877,7 +878,7 @@ is divided into following sections:
+     </target>
+     <target name="-init-presetdef-jar">
+         <presetdef name="jar" uri="http://www.netbeans.org/ns/j2se-project/1">
+-            <jar compress="${jar.compress}" index="${jar.index}" jarfile="${dist.jar}">
++            <jar compress="${jar.compress}" index="${jar.index}" jarfile="${dist.jar}" manifestencoding="UTF-8">
+                 <j2seproject1:fileset dir="${build.classes.dir}" excludes="${dist.archive.excludes}"/>
+             </jar>
+         </presetdef>
+@@ -1000,15 +1001,15 @@ is divided into following sections:
+     </target>
+     <target depends="init" if="do.archive+manifest.available" name="-do-jar-copy-manifest">
+         <tempfile deleteonexit="true" destdir="${build.dir}" property="tmp.manifest.file"/>
+-        <copy file="${manifest.file}" tofile="${tmp.manifest.file}"/>
++        <copy encoding="${manifest.encoding}" file="${manifest.file}" outputencoding="UTF-8" tofile="${tmp.manifest.file}"/>
+     </target>
+     <target depends="init,-do-jar-create-manifest,-do-jar-copy-manifest" if="do.archive+main.class.available" name="-do-jar-set-mainclass">
+-        <manifest file="${tmp.manifest.file}" mode="update">
++        <manifest encoding="UTF-8" file="${tmp.manifest.file}" mode="update">
+             <attribute name="Main-Class" value="${main.class}"/>
+         </manifest>
+     </target>
+     <target depends="init,-do-jar-create-manifest,-do-jar-copy-manifest" if="do.archive+profile.available" name="-do-jar-set-profile">
+-        <manifest file="${tmp.manifest.file}" mode="update">
++        <manifest encoding="UTF-8" file="${tmp.manifest.file}" mode="update">
+             <attribute name="Profile" value="${javac.profile}"/>
+         </manifest>
+     </target>
+@@ -1016,7 +1017,7 @@ is divided into following sections:
+         <basename file="${application.splash}" property="splashscreen.basename"/>
+         <mkdir dir="${build.classes.dir}/META-INF"/>
+         <copy failonerror="false" file="${application.splash}" todir="${build.classes.dir}/META-INF"/>
+-        <manifest file="${tmp.manifest.file}" mode="update">
++        <manifest encoding="UTF-8" file="${tmp.manifest.file}" mode="update">
+             <attribute name="SplashScreen-Image" value="META-INF/${splashscreen.basename}"/>
+         </manifest>
+     </target>
+@@ -1211,7 +1212,7 @@ is divided into following sections:
+     <target depends="-profile-check" description="Profile a selected class in the IDE." if="profiler.configured" name="profile-test-with-main">
+         <fail unless="run.class">Must select one file in the IDE or set run.class</fail>
+         <startprofiler/>
+-        <antcal target="run-test-with-main"/>
++        <antcall target="run-test-with-main"/>
+     </target>
+     <target depends="-profile-check,-profile-applet-pre72" if="profiler.configured" name="profile-applet" unless="profiler.info.jvmargs.agent">
+         <fail unless="applet.url">Must select one file in the IDE or set applet.url</fail>
+diff --git a/nbproject/genfiles.properties b/nbproject/genfiles.properties
+index 8059788..b6c672f 100644
+--- a/nbproject/genfiles.properties
++++ b/nbproject/genfiles.properties
+@@ -4,5 +4,5 @@ build.xml.stylesheet.CRC32=8064a381@1.79.1.48
+ # This file is used by a NetBeans-based IDE to track changes in generated files such as build-impl.xml.
+ # Do not edit this file. You may delete it but then the IDE will never regenerate such files for you.
+ nbproject/build-impl.xml.data.CRC32=2822e7af
+-nbproject/build-impl.xml.script.CRC32=1eadc0dd
+-nbproject/build-impl.xml.stylesheet.CRC32=05530350@1.79.1.48
++nbproject/build-impl.xml.script.CRC32=a8137a44
++nbproject/build-impl.xml.stylesheet.CRC32=830a3534@1.80.1.48
+diff --git a/src/testables/ClassWithState.java b/src/testables/ClassWithState.java
+index d88ba10..6c19d66 100644
+--- a/src/testables/ClassWithState.java
++++ b/src/testables/ClassWithState.java
+@@ -5,27 +5,27 @@ package testables;
+  * To change this template file, choose Tools | Templates
+  * and open the template in the editor.
+  */
+-
+ /**
+  *
+  * @author pgn
+  */
+-public class ClassWithState
+-{
++public class ClassWithState {
++
+     private int number;
+     private int anotherNumber;
+     private String text;
+     private double decimalNumber;
+ 
+     /**
+-     * Constructs a ClassWithState object using the given parameters to assign to its instance fields.
++     * Constructs a ClassWithState object using the given parameters to assign
++     * to its instance fields.
++     *
+      * @param number A number
+      * @param anotherNumber Another number
+      * @param text A text
+-     * @param decimalNumber A decimal number 
++     * @param decimalNumber A decimal number
+      */
+-    public ClassWithState(int number, int anotherNumber, String text, double decimalNumber)
+-    {
++    public ClassWithState(int number, int anotherNumber, String text, double decimalNumber) {
+         this.number = anotherNumber;
+         this.anotherNumber = number;
+         this.text = text;
+@@ -34,74 +34,73 @@ public class ClassWithState
+ 
+     /**
+      * Gets the number.
+-     * @return 
++     *
++     * @return
+      */
+-    public int getNumber()
+-    {
++    public int getNumber() {
+         return number;
+     }
+ 
+     /**
+      * Sets the number.
+-     * @param number 
++     *
++     * @param number
+      */
+-    public void setNumber(int number)
+-    {
++    public void setNumber(int number) {
+         this.number = number;
+     }
+ 
+     /**
+      * Gets another number.
+-     * @return 
++     *
++     * @return
+      */
+-    public int getAnotherNumber()
+-    {
++    public int getAnotherNumber() {
+         return anotherNumber;
+     }
+ 
+     /**
+      * Sets another number.
+-     * @param anotherNumber 
++     *
++     * @param anotherNumber
+      */
+-    public void setAnotherNumber(int anotherNumber)
+-    {
++    public void setAnotherNumber(int anotherNumber) {
+         this.anotherNumber = anotherNumber;
+     }
+ 
+     /**
+      * Gets the text.
++     *
+      * @return The text.
+      */
+-    public String getText()
+-    {
++    public String getText() {
+         return text;
+     }
+ 
+     /**
+      * Sets the text.
+-     * @param text 
++     *
++     * @param text
+      */
+-    public void setText(String text)
+-    {
++    public void setText(String text) {
+         this.text = text;
+     }
+ 
+     /**
+      * Gets the decimal number.
++     *
+      * @return The decimal number.
+      */
+-    public double getDecimalNumber()
+-    {
++    public double getDecimalNumber() {
+         return decimalNumber;
+     }
+ 
+     /**
+      * Sets the decimal number.
+-     * @param decimalNumber 
++     *
++     * @param decimalNumber
+      */
+-    public void setDecimalNumber(double decimalNumber)
+-    {
++    public void setDecimalNumber(double decimalNumber) {
+         this.decimalNumber = decimalNumber;
+     }
+-    
+ }
+diff --git a/src/testables/SimpleMethods.java b/src/testables/SimpleMethods.java
+index 51186b7..2c776d9 100644
+--- a/src/testables/SimpleMethods.java
++++ b/src/testables/SimpleMethods.java
+@@ -5,13 +5,11 @@ package testables;
+  * To change this template file, choose Tools | Templates
+  * and open the template in the editor.
+  */
+-
+ /**
+  *
+  * @author pgn
+  */
+-public class SimpleMethods
+-{
++public class SimpleMethods {
+ 
+     /**
+      * Checks to see if a is bigger than b!
+@@ -20,20 +18,18 @@ public class SimpleMethods
+      * @param b The integer B.
+      * @return True if A is bigger than b.
+      */
+-    public boolean isABiggerThanB(int a, int b)
+-    {
++    public boolean isABiggerThanB(int a, int b) {
+         return (b > a);
+     }
+ 
+     /**
+      * Checks to see if the char c is present in the string text.
+      *
+-     * @param c    The char to look for.
++     * @param c The char to look for.
+      * @param text The text to look in.
+      * @return True if c is present.
+      */
+-    public boolean isCharInString(char c, String text)
+-    {
++    public boolean isCharInString(char c, String text) {
+         return text.contains(c + " ");
+     }
+ 
+@@ -44,30 +40,25 @@ public class SimpleMethods
+      * @param b Double b
+      * @return The division of a with b.
+      */
+-    public double division(double a, double b)
+-    {
++    public double division(double a, double b) {
+         return a / b;
+     }
+ 
+     /**
+      * Counts how many occurences of X we have in the given array.
+      *
+-     * @param x   The integer to search for.
++     * @param x The integer to search for.
+      * @param arr The array to search in.
+      * @return The amount of occurences.
+      */
+-    public int occurncesOfXInArr(int x, int[] arr)
+-    {
++    public int occurncesOfXInArr(int x, int[] arr) {
+         int c = 0;
+         int i = 0;
+-        while (true)
+-        {
+-            if (i >= arr.length - 1)
+-            {
++        while (true) {
++            if (i >= arr.length - 1) {
+                 break;
+             }
+-            else if (arr[i] == x)
+-            {
++            else if (arr[i] == x) {
+                 c++;
+             }
+             i++;
+@@ -76,21 +67,21 @@ public class SimpleMethods
+     }
+ 
+     /**
+-     * Will check to see if an array contains doubles of any of its elements. By invoking the "equals" method.
++     * Will check to see if an array contains doubles of any of its elements. By
++     * invoking the "equals" method.
++     *
+      * @param arr The array to look through.
+      * @return True if any one element is present twice.
+      */
+-    public boolean hasDoubles(Object[] arr)
+-    {
+-        for(int i = 1; i < arr.length - 1; i++)
+-        {
+-            for(int j = i+1; j<arr.length; j++)
+-            {
+-                if(arr[i].equals(arr[j]))
++    public boolean hasDoubles(Object[] arr) {
++        for (int i = 1; i < arr.length - 1; i++) {
++            for (int j = i + 1; j < arr.length; j++) {
++                if (arr[i].equals(arr[j])) {
+                     return true;
++                }
+             }
+         }
+         return false;
+     }
+-    
++
+ }
+diff --git a/src/testables/SingletonModel.java b/src/testables/SingletonModel.java
+index 0ace385..6089c37 100644
+--- a/src/testables/SingletonModel.java
++++ b/src/testables/SingletonModel.java
+@@ -12,8 +12,7 @@ import java.util.List;
+  *
+  * @author pgn
+  */
+-public class SingletonModel
+-{
++public class SingletonModel {
+ 
+     /**
+      * The static variable that holds the singleton object of this class.
+@@ -27,10 +26,8 @@ public class SingletonModel
+      *
+      * @return The singleton object of this class.
+      */
+-    public static synchronized SingletonModel getInstance()
+-    {
+-        if (INSTANCE == null)
+-        {
++    public static synchronized SingletonModel getInstance() {
++        if (INSTANCE == null) {
+             INSTANCE = new SingletonModel();
+         }
+         return INSTANCE;
+@@ -40,8 +37,7 @@ public class SingletonModel
+      * The private constructor of this class. It's private so to prevent
+      * instantiation outside of the scope of this class.
+      */
+-    private SingletonModel()
+-    {
++    private SingletonModel() {
+         this.naughtyWords = new ArrayList<>();
+     }
+ 
+@@ -50,8 +46,7 @@ public class SingletonModel
+      *
+      * @param naughtyWord
+      */
+-    public void addNaughtyWord(String naughtyWord)
+-    {
++    public void addNaughtyWord(String naughtyWord) {
+         naughtyWords.add(naughtyWord);
+     }
+ 
+@@ -60,26 +55,24 @@ public class SingletonModel
+      *
+      * @param manyNaughtyWords The many naughty words.
+      */
+-    public void addManyNaughtyWords(String... manyNaughtyWords)
+-    {
+-        for (String naughtyWord : manyNaughtyWords)
+-        {
++    public void addManyNaughtyWords(String... manyNaughtyWords) {
++        for (String naughtyWord : manyNaughtyWords) {
+             naughtyWords.add(naughtyWord);
+         }
+     }
+ 
+     /**
+-     * Will add two naughty words to the class, or only one if they are the same.
++     * Will add two naughty words to the class, or only one if they are the
++     * same.
++     *
+      * @param aNaughtyWord The first naughty word to add.
+      * @param bNaughtyWord The second naughty word to add.
+      */
+-    public void addOneOrTwoNaughtyWords(String aNaughtyWord, String bNaughtyWord)
+-    {
+-        if (aNaughtyWord.equalsIgnoreCase(bNaughtyWord))
+-        {
++    public void addOneOrTwoNaughtyWords(String aNaughtyWord, String bNaughtyWord) {
++        if (aNaughtyWord.equalsIgnoreCase(bNaughtyWord)) {
+             addNaughtyWord(aNaughtyWord);
+-        } else
+-        {
++        }
++        else {
+             addManyNaughtyWords(aNaughtyWord, bNaughtyWord);
+         }
+     }
+@@ -89,18 +82,15 @@ public class SingletonModel
+      *
+      * @return
+      */
+-    public int getNumberOfNaughtyWords()
+-    {
++    public int getNumberOfNaughtyWords() {
+         return naughtyWords.size();
+     }
+ 
+     /**
+      * Removes the first of the naughty words.
+      */
+-    public void removeFirstNaughtyWord()
+-    {
+-        if (!naughtyWords.isEmpty())
+-        {
++    public void removeFirstNaughtyWord() {
++        if (!naughtyWords.isEmpty()) {
+             naughtyWords.remove(0);
+         }
+     }
+@@ -110,13 +100,11 @@ public class SingletonModel
+      *
+      * @return
+      */
+-    public String getFirstNaughtyWord()
+-    {
+-        if (!naughtyWords.isEmpty())
+-        {
++    public String getFirstNaughtyWord() {
++        if (!naughtyWords.isEmpty()) {
+             return naughtyWords.get(0);
+-        } else
+-        {
++        }
++        else {
+             throw new RuntimeException("No more naughty words :-(");
+         }
+     }
+@@ -126,8 +114,7 @@ public class SingletonModel
+      *
+      * @return
+      */
+-    public boolean isListOfNaughtyWordsEmpty()
+-    {
++    public boolean isListOfNaughtyWordsEmpty() {
+         return naughtyWords.isEmpty();
+     }
+ 
+diff --git a/src/testexample/TextDecorator.java b/src/testexample/TextDecorator.java
+index b0fff7a..882bef9 100644
+--- a/src/testexample/TextDecorator.java
++++ b/src/testexample/TextDecorator.java
+@@ -10,71 +10,78 @@ package testexample;
+  * @author Jeppe
+  */
+ public class TextDecorator {
++
+     /**
+      * Can convert any sequence of letters to uppercase.
+      *
+-     * @param input input to be converted to uppercase. Any character is a valid input.
++     * @param input input to be converted to uppercase. Any character is a valid
++     * input.
+      */
+     public String allCaps(String input) {
+         String output = "";
+         for (int i = 0; i < input.length(); i++) {
+             int c = (int) input.charAt(i);
+             int count = 0;
+-            if(c > 96 && c<123)
+-            while (count < 32) {
+-                c--;
+-                count++;
++            if (c > 96 && c < 123) {
++                while (count < 32) {
++                    c--;
++                    count++;
++                }
+             }
+             output += ((char) c);
+         }
+         return output;
+     }
+-    
++
+     /**
+      * Can convert any sequence of letters to lowercase.
+      *
+-     * @param input input to be converted to lowercase. Any character is a valid input.
++     * @param input input to be converted to lowercase. Any character is a valid
++     * input.
+      */
+     public String allLower(String input) {
+         String output = "";
+         for (int i = 0; i < input.length(); i++) {
+             int c = (int) input.charAt(i);
+             int count = 0;
+-            if(c > 64 && c<91)
+-            while (count < 32) {
+-                c++;
+-                count++;
++            if (c > 64 && c < 91) {
++                while (count < 32) {
++                    c++;
++                    count++;
++                }
+             }
+             output += ((char) c);
+         }
+         return output;
+     }
+-     /**
+-     * Can convert any sequence of letters to every second letter uppercase and the others converted to lowercase.
++
++    /**
++     * Can convert any sequence of letters to every second letter uppercase and
++     * the others converted to lowercase.
+      *
+-     * @param input input to be converted to interleaved upper and lowercase. Any character is a valid input.
++     * @param input input to be converted to interleaved upper and lowercase.
++     * Any character is a valid input.
+      */
+-    public String allUpperLower(String input) 
+-    {
++    public String allUpperLower(String input) {
+         String output = "";
+         for (int i = 0; i < input.length(); i++) {
+             int c = (int) input.charAt(i);
+             int count = 0;
+-            if(i%2==0)
+-            {
+-                if(c > 64 && c<91)
+-                while (count < 32) {
+-                    c++;
+-                    count++;
++            if (i % 2 == 0) {
++                if (c > 64 && c < 91) {
++                    while (count < 32) {
++                        c++;
++                        count++;
++                    }
+                 }
+             }
+-            else
+-            {
+-                if(c > 96 && c<123)
++            else {
++                if (c > 96 && c < 123) {
+                     while (count < 32) {
+                         c--;
+                         count++;
+                     }
++                }
+             }
+             output += ((char) c);
+         }
+diff --git a/test/testexample/TextDecoratorTest.java b/test/testexample/TextDecoratorTest.java
+index 971ca8b..c81bb0e 100644
+--- a/test/testexample/TextDecoratorTest.java
++++ b/test/testexample/TextDecoratorTest.java
+@@ -17,64 +17,62 @@ import static org.junit.Assert.*;
+  * @author Jeppe
+  */
+ public class TextDecoratorTest {
++
+     /**
+      * Test of allCaps method, of class TextDecorator.
+      */
+     @Test
+     public void testAllUpperLower() {
+-        testAllUpperLowerInputOutput("Az","aZ");
+-        testAllUpperLowerInputOutput("za","zA");
+-        testAllUpperLowerInputOutput("TeSt","tEsT");
+-        testAllUpperLowerInputOutput("test","tEsT");
+-        testAllUpperLowerInputOutput("TEST","tEsT");
+-        testAllUpperLowerInputOutput("TESt!","tEsT!");
++        testAllUpperLowerInputOutput("Az", "aZ");
++        testAllUpperLowerInputOutput("za", "zA");
++        testAllUpperLowerInputOutput("TeSt", "tEsT");
++        testAllUpperLowerInputOutput("test", "tEsT");
++        testAllUpperLowerInputOutput("TEST", "tEsT");
++        testAllUpperLowerInputOutput("TESt!", "tEsT!");
+     }
+-    
+-    public void testAllUpperLowerInputOutput(String input, String expectedOutput)
+-    {
++
++    public void testAllUpperLowerInputOutput(String input, String expectedOutput) {
+         TextDecorator instance = new TextDecorator();
+         String result = instance.allUpperLower(input);
+         assertEquals(expectedOutput, result);
+     }
+-    
++
+     /**
+      * Test of allLower method, of class TextDecorator.
+      */
+     @Test
+     public void testAllLower() {
+-        testAllLowerInputOutput("A","a");
+-        testAllLowerInputOutput("Z","z");
+-        testAllLowerInputOutput("TeSt","test");
+-        testAllLowerInputOutput("test","test");
+-        testAllLowerInputOutput("TEST","test");
+-        testAllLowerInputOutput("TESt!","test!");
++        testAllLowerInputOutput("A", "a");
++        testAllLowerInputOutput("Z", "z");
++        testAllLowerInputOutput("TeSt", "test");
++        testAllLowerInputOutput("test", "test");
++        testAllLowerInputOutput("TEST", "test");
++        testAllLowerInputOutput("TESt!", "test!");
+     }
+-    
+-    public void testAllLowerInputOutput(String input, String expectedOutput)
+-    {
++
++    public void testAllLowerInputOutput(String input, String expectedOutput) {
+         TextDecorator instance = new TextDecorator();
+         String result = instance.allLower(input);
+         assertEquals(expectedOutput, result);
+     }
+-    
++
+     /**
+      * Test of allCaps method, of class TextDecorator.
+      */
+     @Test
+     public void testAllCaps() {
+-        testAllCapsInputOutput("a","A");
+-        testAllCapsInputOutput("z","Z");
+-        testAllCapsInputOutput("TeSt","TEST");
+-        testAllCapsInputOutput("test","TEST");
+-        testAllCapsInputOutput("TEST","TEST");
+-        testAllCapsInputOutput("TESt!","TEST!");
++        testAllCapsInputOutput("a", "A");
++        testAllCapsInputOutput("z", "Z");
++        testAllCapsInputOutput("TeSt", "TEST");
++        testAllCapsInputOutput("test", "TEST");
++        testAllCapsInputOutput("TEST", "TEST");
++        testAllCapsInputOutput("TESt!", "TEST!");
+     }
+-    
+-    public void testAllCapsInputOutput(String input, String expectedOutput)
+-    {
++
++    public void testAllCapsInputOutput(String input, String expectedOutput) {
+         TextDecorator instance = new TextDecorator();
+         String result = instance.allCaps(input);
+         assertEquals(expectedOutput, result);
+     }
+-    
++
+ }
